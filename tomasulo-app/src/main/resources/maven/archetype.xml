@@ -1,0 +1,9 @@
+<archetype>
+  <id>tomasulo-app</id>
+  <sources>
+    <source>src/main/java/com.puc.tomasulo.App.java</source>
+  </sources>
+  <testSources>
+    <source>src/test/java/AppTest.java</source>
+  </testSources>
+</archetype>
