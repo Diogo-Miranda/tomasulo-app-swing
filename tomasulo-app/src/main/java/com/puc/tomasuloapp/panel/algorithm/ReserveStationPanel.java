@@ -6,7 +6,7 @@ import com.puc.tomasuloapp.panel.algorithm.wrapped.ReserveStationWrapped;
 import javax.swing.*;
 
 public class ReserveStationPanel extends JTabbedPane {
-    protected ReserveStationWrapped reserveStationWrapped;
+    public ReserveStationWrapped reserveStationWrapped;
 
     public ReserveStationPanel() {
         reserveStationWrapped = new ReserveStationWrapped();

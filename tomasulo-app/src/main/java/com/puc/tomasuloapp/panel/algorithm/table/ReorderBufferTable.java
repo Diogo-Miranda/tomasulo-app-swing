@@ -11,6 +11,8 @@ public class ReorderBufferTable extends JScrollPane {
     protected DefaultTableModel defaultTableModel;
     protected JTable registersTable;
 
+    private final int colNumber = 6;
+
     public ReorderBufferTable(boolean editable) {
         defaultTableModel = new DefaultTableModel() {
             @Override
@@ -36,10 +38,36 @@ public class ReorderBufferTable extends JScrollPane {
     public void addRow(List<Instruction> instructions) {
         Integer instructionCount = 0;
         for(var instruction : instructions) {
-            Object[] rowData = new Object[6];
+            Object[] rowData = new Object[colNumber];
+            // Entrada
             rowData[0] = instructionCount.toString();
+            // Busy
             rowData[1] = instruction.getBusy().toString();
+            // Instruction
+            rowData[2] = instruction.toString();
+            // Status
+            rowData[3] = "intial";
+            // Destino
+            rowData[4] = instruction.getRegDestiny();
             instructionCount++;
+
+            // add on table
+            getModel().addRow(rowData);
         }
     }
+
+    public Object[] getRow(int row) {
+        Object[] result = new String[colNumber];
+
+        for (int i = 0; i < colNumber; i++) {
+            result[i] = getModel().getValueAt(row, i);
+        }
+
+        return result;
+    }
+
+    public DefaultTableModel getModel() {
+        return defaultTableModel;
+    }
+
 }

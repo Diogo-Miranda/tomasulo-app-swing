@@ -23,7 +23,7 @@ public class ControlPanel extends JPanel {
         runButton = new RunButton(algorithmPanel);
         runButton.setIcon(runIcon);
 
-        stepButton = new StepButton();
+        stepButton = new StepButton(algorithmPanel);
         stepButton.setIcon(stepIcon);
 
         add(runButton, "wrap");

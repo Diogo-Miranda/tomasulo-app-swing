@@ -6,7 +6,7 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 
 public class ReserveStationWrapped extends JPanel {
-    protected final ReserveStationTable reserveStationTable;
+    public final ReserveStationTable reserveStationTable;
     public ReserveStationWrapped() {
         super(new MigLayout());
 

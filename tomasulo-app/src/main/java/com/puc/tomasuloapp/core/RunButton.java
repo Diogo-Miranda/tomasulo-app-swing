@@ -1,26 +1,12 @@
 package com.puc.tomasuloapp.core;
 
-import com.puc.tomasuloapp.factory.ConfigFactory;
-import com.puc.tomasuloapp.model.Instruction;
-import com.puc.tomasuloapp.model.Register;
 import com.puc.tomasuloapp.panel.algorithm.AlgorithmPanel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
+
+import com.puc.tomasuloapp.component.CoreComponent;
 
 public class RunButton extends JButton {
-    @Inject
-    @Named("instructions")
-    private List<Instruction> instructions;
-
-    @Inject
-    @Named("registers")
-    private List<Register> registers;
 
     public RunButton(AlgorithmPanel algorithmPanel) {
         setText("Run");
@@ -29,16 +15,22 @@ public class RunButton extends JButton {
             setText("Running");
             makeRegisterTable(algorithmPanel);
             makeBufferReordTable(algorithmPanel);
+            makeReserveStationTable(algorithmPanel);
         });
     }
 
     private void makeBufferReordTable(AlgorithmPanel algorithmPanel) {
-        // var instructions = new ConfigFactory().getInstructions();
         var reorderBufferTable = algorithmPanel.reorderBufferPanel.reorderBufferWrapped.reorderBufferTable;
+        reorderBufferTable.addRow(CoreComponent.initInstructions());
     }
 
     private void makeRegisterTable(AlgorithmPanel algorithmPanel) {
         var registersTable = algorithmPanel.registersPanel.registersWrapped.registersTable;
-        registersTable.addRow(this.registers);
+        registersTable.addRow(CoreComponent.initRegisters());
+    }
+
+    private void makeReserveStationTable(AlgorithmPanel algorithmPanel) {
+        var reserveStationTable = algorithmPanel.reserveStationPanel.reserveStationWrapped.reserveStationTable;
+        reserveStationTable.addRow(CoreComponent.initReserveStation());
     }
 }

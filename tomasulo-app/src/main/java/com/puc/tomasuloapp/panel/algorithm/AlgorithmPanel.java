@@ -10,7 +10,7 @@ public class AlgorithmPanel extends JPanel {
     public int id;
     public final RegistersPanel registersPanel;
     public final ReorderBufferPanel reorderBufferPanel;
-    protected final ReserveStationPanel reserveStationPanel;
+    public final ReserveStationPanel reserveStationPanel;
 
     protected final ControlPanel controlPanel;
 

@@ -5,19 +5,16 @@ import com.formdev.flatlaf.util.SystemInfo;
 import com.puc.tomasuloapp.core.Frame;
 import com.puc.tomasuloapp.helper.FontLoader;
 import com.puc.tomasuloapp.panel.MainPanel;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import javax.swing.*;
 import java.awt.*;
 
-@SpringBootApplication
-public class TomasuloAppApplication {
+public class TomasuloAppApplication extends JFrame {
+
+	public static int defaultWidth = 1024;
+	public static int defaultHeight = 600;
 
 	public static void main(String[] args) {
-		var ctx = new SpringApplicationBuilder(TomasuloAppApplication.class)
-				.headless(false).run(args);
 
 		System.setProperty("awt.useSystemAAFontSettings", "lcd");
 		System.setProperty("swing.aatext", "true");
@@ -37,7 +34,7 @@ public class TomasuloAppApplication {
 			JDialog.setDefaultLookAndFeelDecorated(true);
 			JFrame.setDefaultLookAndFeelDecorated(true);
 
-			var frame = new Frame("Tomasulo Algorithm");
+			var frame = new Frame("Tomasulo App");
 			frame.setName("Runnable simulator for Tomasulo Algorithm");
 
 			try {
@@ -51,4 +48,21 @@ public class TomasuloAppApplication {
 		});
 	}
 
+	private void initUI(String title, Boolean customTitleBar, int width, int height) {
+		setTitle(title);
+
+		var dimension = new Dimension(width, height);
+
+		setUndecorated(customTitleBar);
+
+		if (customTitleBar) {
+			// new CustomTitle Bar TODO
+		}
+
+		var dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(dimension);
+		setLocation(dim.width / 2 - getSize().width / 2, dim.height / 2 - getSize().height / 2);
+	}
 }
