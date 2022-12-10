@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class Instruction {
+    private String id;
     private InstructionsEnum identifier;
     private String regDestiny;
     private String regOne;
@@ -32,5 +33,9 @@ public class Instruction {
                 .append(",")
                 .append(regTwo != null ? regTwo : immediate)
                 .toString();
+    }
+
+    public String busyToString() {
+        return busy ? "Yes" : "Not";
     }
 }

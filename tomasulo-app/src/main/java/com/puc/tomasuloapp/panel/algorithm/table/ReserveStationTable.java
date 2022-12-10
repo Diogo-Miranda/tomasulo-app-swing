@@ -43,7 +43,7 @@ public class ReserveStationTable extends JScrollPane implements ITable<ReserveSt
         for(var reserveStation : reserveStations) {
             Object[] rowData = new Object[colNumber];
             rowData[0] = reserveStation.getName();
-            rowData[1] = reserveStation.getBusy().toString();
+            rowData[1] = reserveStation.busyToString();
             rowData[2] = reserveStation.getOp();
             rowData[3] = reserveStation.getVj();
             rowData[4] = reserveStation.getQj();
@@ -73,5 +73,17 @@ public class ReserveStationTable extends JScrollPane implements ITable<ReserveSt
 
     public DefaultTableModel getModel() {
         return defaultTableModel;
+    }
+
+    @Override
+    public void updateRow(String visitorId, Object[] data) {
+        if (data.length > colNumber)
+            throw new IllegalArgumentException("data[] is to long");
+        for (int i = 0; i < getRowCount(); i++) {
+            if ((getModel().getValueAt(i, 0)).equals(visitorId))
+                for (int j = 1; j < data.length+1; j++) {
+                    getModel().setValueAt(data[j-1], i, j);
+                }
+        }
     }
 }

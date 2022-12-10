@@ -9,4 +9,5 @@ public interface ITable<T> {
     int getRowCount();
 
     DefaultTableModel getModel();
+    void updateRow(String visitorId, Object[] data);
 }

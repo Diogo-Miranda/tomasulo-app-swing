@@ -43,7 +43,7 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
             // Entrada
             rowData[0] = instructionCount.toString();
             // Busy
-            rowData[1] = instruction.getBusy().toString();
+            rowData[1] = instruction.busyToString();
             // Instruction
             rowData[2] = instruction.toString();
             // Status
@@ -73,6 +73,18 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
 
     public DefaultTableModel getModel() {
         return defaultTableModel;
+    }
+
+    @Override
+    public void updateRow(String visitorId, Object[] data) {
+        if (data.length > colNumber)
+            throw new IllegalArgumentException("data[] is to long");
+        for (int i = 0; i < getRowCount(); i++) {
+            if (Integer.parseInt((String) getModel().getValueAt(i, 0)) == (Integer.parseInt(visitorId)))
+                for (int j = 1; j < data.length+1; j++) {
+                    getModel().setValueAt(data[j-1], i, j);
+                }
+        }
     }
 
 }

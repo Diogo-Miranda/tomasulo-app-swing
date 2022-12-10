@@ -20,4 +20,7 @@ public class ReserveStation {
     private String dest;
     private String a;
 
+    public String busyToString() {
+        return busy ? "Yes" : "Not";
+    }
 }

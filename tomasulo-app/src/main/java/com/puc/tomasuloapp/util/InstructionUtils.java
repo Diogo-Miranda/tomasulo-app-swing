@@ -8,7 +8,7 @@ public class InstructionUtils implements ISerializable<Instruction> {
     @Override
     public Instruction deserialize(Object[] rowData) {
         // Entrada
-        var instructionCount = (String) rowData[0];
+        var id = (String) rowData[0];
         // Busy
         var busy = Boolean.valueOf((String) rowData[1]);
         // Instruction
@@ -23,6 +23,7 @@ public class InstructionUtils implements ISerializable<Instruction> {
         if(instruction.equalsIgnoreCase(InstructionsEnum.LW.name())
                 || instruction.equalsIgnoreCase(InstructionsEnum.SW.name())) {
             return Instruction.builder()
+                    .id(id)
                     .identifier(InstructionsEnum.valueOf(instruction))
                     .busy(busy)
                     .regDestiny(regs[0])
@@ -32,6 +33,7 @@ public class InstructionUtils implements ISerializable<Instruction> {
                     .build();
         } else {
             return Instruction.builder()
+                    .id(id)
                     .identifier(InstructionsEnum.valueOf(instruction))
                     .busy(busy)
                     .regDestiny(regs[0])
@@ -40,5 +42,15 @@ public class InstructionUtils implements ISerializable<Instruction> {
                     .status(status)
                     .build();
         }
+    }
+
+    public String[] serialize(Instruction instruction) {
+        String[] data = new String[5];
+        data[0] = instruction.busyToString();
+        data[1] = instruction.toString();
+        data[2] = instruction.getStatus();
+        data[3] = instruction.getRegDestiny();
+        data[4] = "";
+        return data;
     }
 }

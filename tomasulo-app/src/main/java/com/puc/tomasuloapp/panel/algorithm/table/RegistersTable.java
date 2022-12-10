@@ -10,6 +10,9 @@ import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
 public class RegistersTable extends JScrollPane implements ITable<Register> {
+    public static final String VISITOR_BUSY = "busy";
+    public static final String VISITOR_REORD = "reord";
+
     protected DefaultTableModel defaultTableModel;
     protected JTable registersTable;
     private static final int NUMBER_OF_REGISTERS = CoreComponent.numberOfRegs;
@@ -38,6 +41,19 @@ public class RegistersTable extends JScrollPane implements ITable<Register> {
 
     public DefaultTableModel getModel() {
         return defaultTableModel;
+    }
+
+    @Override
+    public void updateRow(String visitorId, Object[] data) {
+        if (visitorId.equals(VISITOR_BUSY)) {
+            for (int j = 1; j < data.length+1; j++) {
+                getModel().setValueAt(data[j-1], 1, j);
+            }
+        } else if (visitorId.equals(VISITOR_REORD)) {
+            for (int j = 1; j < data.length+1; j++) {
+                getModel().setValueAt(data[j-1], 0, j);
+            }
+        }
     }
 
     public void addRow(List<Register> registers) {

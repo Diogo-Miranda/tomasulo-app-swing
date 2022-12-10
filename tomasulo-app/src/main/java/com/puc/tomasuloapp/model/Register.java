@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class Register {
     private String name;
     private Integer reorderNumber;
-    private boolean busy;
+    private Boolean busy;
 
     public String busyToString() {
         return busy ? "Yes" : "Not";

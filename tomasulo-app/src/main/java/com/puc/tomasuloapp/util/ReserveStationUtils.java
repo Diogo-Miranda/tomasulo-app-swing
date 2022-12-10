@@ -28,4 +28,18 @@ public class ReserveStationUtils implements ISerializable<ReserveStation> {
                 .a(a)
                 .build();
     }
+
+    @Override
+    public String[] serialize(ReserveStation input) {
+        String[] data = new String[8];
+        data[0] = input.busyToString();
+        data[1] = input.getOp();
+        data[2] = input.getVj();
+        data[3] = input.getVk();
+        data[4] = input.getQj();
+        data[5] = input.getQk();
+        data[6] = input.getDest();
+        data[7] = input.getA();
+        return data;
+    }
 }

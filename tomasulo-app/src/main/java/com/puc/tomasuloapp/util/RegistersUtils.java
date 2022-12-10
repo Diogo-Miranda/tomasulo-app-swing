@@ -1,7 +1,6 @@
 package com.puc.tomasuloapp.util;
 
 import com.puc.tomasuloapp.component.CoreComponent;
-import com.puc.tomasuloapp.domain.ISerializable;
 import com.puc.tomasuloapp.model.Register;
 
 import java.util.ArrayList;
@@ -23,5 +22,21 @@ public class RegistersUtils {
         }
 
         return registers;
+    }
+
+    public String[] serializeReorder(List<Register> registers) {
+        String[] data = new String[CoreComponent.numberOfRegs];
+        for (int i = 0; i < CoreComponent.numberOfRegs; i++) {
+            data[i] = String.valueOf(registers.get(i).getReorderNumber());
+        }
+        return data;
+    }
+
+    public String[] serializeBusy(List<Register> registers) {
+        String[] data = new String[CoreComponent.numberOfRegs];
+        for (int i = 0; i < CoreComponent.numberOfRegs; i++) {
+            data[i] = String.valueOf(registers.get(i).busyToString());
+        }
+        return data;
     }
 }
