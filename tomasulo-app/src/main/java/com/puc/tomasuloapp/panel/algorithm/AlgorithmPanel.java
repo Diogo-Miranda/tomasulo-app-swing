@@ -12,7 +12,7 @@ public class AlgorithmPanel extends JPanel {
     public final ReorderBufferPanel reorderBufferPanel;
     public final ReserveStationPanel reserveStationPanel;
 
-    protected final ControlPanel controlPanel;
+    public final ControlPanel controlPanel;
 
     public AlgorithmPanel() throws TranscoderException, IOException {
         super(new MigLayout("insets 10 10 10 10"));

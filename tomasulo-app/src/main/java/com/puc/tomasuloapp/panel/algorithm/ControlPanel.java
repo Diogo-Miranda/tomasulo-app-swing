@@ -13,8 +13,8 @@ import java.net.URL;
 
 public class ControlPanel extends JPanel {
 
-    protected final StepButton stepButton;
-    protected final RunButton runButton;
+    public final StepButton stepButton;
+    public final RunButton runButton;
 
     public ControlPanel(AlgorithmPanel algorithmPanel) throws TranscoderException, IOException {
         var runIcon = svgIcon("run.svg");

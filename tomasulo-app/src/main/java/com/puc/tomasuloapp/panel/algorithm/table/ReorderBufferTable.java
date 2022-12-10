@@ -1,13 +1,14 @@
 package com.puc.tomasuloapp.panel.algorithm.table;
 
 
+import com.puc.tomasuloapp.domain.ITable;
 import com.puc.tomasuloapp.model.Instruction;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class ReorderBufferTable extends JScrollPane {
+public class ReorderBufferTable extends JScrollPane implements ITable<Instruction> {
     protected DefaultTableModel defaultTableModel;
     protected JTable registersTable;
 
@@ -64,6 +65,10 @@ public class ReorderBufferTable extends JScrollPane {
         }
 
         return result;
+    }
+
+    public int getRowCount() {
+        return getModel().getRowCount();
     }
 
     public DefaultTableModel getModel() {

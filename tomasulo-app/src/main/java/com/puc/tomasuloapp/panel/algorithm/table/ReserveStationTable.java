@@ -1,5 +1,6 @@
 package com.puc.tomasuloapp.panel.algorithm.table;
 
+import com.puc.tomasuloapp.domain.ITable;
 import com.puc.tomasuloapp.model.Instruction;
 import com.puc.tomasuloapp.model.ReserveStation;
 
@@ -7,7 +8,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class ReserveStationTable extends JScrollPane {
+public class ReserveStationTable extends JScrollPane implements ITable<ReserveStation> {
     protected DefaultTableModel defaultTableModel;
     protected JTable registersTable;
 
@@ -63,6 +64,11 @@ public class ReserveStationTable extends JScrollPane {
         }
 
         return result;
+    }
+
+    @Override
+    public int getRowCount() {
+        return getModel().getRowCount();
     }
 
     public DefaultTableModel getModel() {

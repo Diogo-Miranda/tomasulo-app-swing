@@ -1,16 +1,20 @@
 package com.puc.tomasuloapp.panel.algorithm.table;
 
 
+import com.puc.tomasuloapp.component.CoreComponent;
+import com.puc.tomasuloapp.domain.ITable;
 import com.puc.tomasuloapp.model.Register;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class RegistersTable extends JScrollPane {
+public class RegistersTable extends JScrollPane implements ITable<Register> {
     protected DefaultTableModel defaultTableModel;
     protected JTable registersTable;
-    private static final int NUMBER_OF_REGISTERS = 10;
+    private static final int NUMBER_OF_REGISTERS = CoreComponent.numberOfRegs;
+
+    private static final int colNumber = CoreComponent.numberOfRegs;
 
     public RegistersTable(boolean editable) {
         defaultTableModel = new DefaultTableModel() {
@@ -38,6 +42,22 @@ public class RegistersTable extends JScrollPane {
 
     public void addRow(List<Register> registers) {
         addRow(registers, true);
+    }
+
+    @Override
+    public Object[] getRow(int row) {
+        Object[] result = new String[colNumber];
+
+        for (int i = 1; i < colNumber; i++) {
+            result[i-1] = getModel().getValueAt(row, i);
+        }
+
+        return result;
+    }
+
+    @Override
+    public int getRowCount() {
+        return getModel().getRowCount();
     }
 
     public void addRow(List<Register> registers, boolean withFocus) {

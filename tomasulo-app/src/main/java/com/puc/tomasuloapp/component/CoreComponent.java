@@ -17,6 +17,8 @@ import java.io.IOException;
 
 public class CoreComponent {
 
+    public static Integer numberOfRegs = 10;
+
     public static List<ReserveStation> initReserveStation() {
         var reserveStationPath = new ConfigFactory().getConfigs().get("nameReserveStation");
 
@@ -104,7 +106,7 @@ public class CoreComponent {
 
     public static ArrayList<Register> initRegisters() {
         var registers = new ArrayList<Register>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < numberOfRegs; i++) {
             registers.add(Register.builder()
                     .reorderNumber(null)
                     .busy(false)
