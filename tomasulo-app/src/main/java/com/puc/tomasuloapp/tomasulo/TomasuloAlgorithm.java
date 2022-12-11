@@ -60,23 +60,25 @@ public class TomasuloAlgorithm {
     reserveStationTable.updateTable(reserveStations);
     registersTable.updateTable(registers);
 
-    // Validar se a instrucao não possui dependencias
-    if (!validateNextInstruction(previousInstruction, instruction) && instructionIndex != 0) {
-      return;
-    }
-
     // Validar se a instrução possui unidades funcionais livres
     var emptyReserveStation = getEmptyReserveStation(reserveStations, instruction);
     if (emptyReserveStation.isEmpty()) {
       return;
     }
 
-    // Ir para a proxima Instrucao
-    instructionQueue.remove();
-
     // Atualizar reserveStation que estava disponivel para a instrucao pega da fila
     updateReserveStations(instruction, emptyReserveStation.get());
     reserveStationTable.updateTable(reserveStations);
+
+    // Validar se a instrucao não possui dependencias
+    if (!validateNextInstruction(previousInstruction, instruction) && instructionIndex != 0) {
+      updateReserveStationsQjAndQk(previousInstruction.getRegDestiny(), instruction, emptyReserveStation.get());
+      // TODO além de validar Vj e Vk em todos os exemplos que são usados agora é preciso validar Qj e Qk
+      reserveStationTable.updateTable(reserveStations);
+    }
+
+    // Ir para a proxima Instrucao
+    instructionQueue.remove();
 
     // Atualizar instrucao atual que foi pega da fila
     instruction.setBusy(true);
@@ -87,6 +89,23 @@ public class TomasuloAlgorithm {
     var register = findRegisterByName(registers, instruction);
     register.setInstructionValue(emptyReserveStation.get().getName());
     registersTable.updateTable(registers);
+  }
+
+  private void updateReserveStationsQjAndQk(String previousInstructionDestiny, Instruction instruction, ReserveStation reserveStation)
+  {
+    if (instruction.isLoadType()) {
+      return;
+    }
+    if(previousInstructionDestiny.equals(instruction.getRegOne())) {
+      reserveStation.setQj(instruction.getRegOne());
+      reserveStation.setVj("");
+    }
+
+    else if(previousInstructionDestiny.equals(instruction.getRegTwo())) {
+      reserveStation.setQk(instruction.getRegTwo());
+      reserveStation.setVk("");
+    }
+    // TODO Verificar todas as instruções anteriores
   }
 
   private void checkAndUpdateRegisters(List<Instruction> instructions, List<Register> registers) {
@@ -208,7 +227,6 @@ public class TomasuloAlgorithm {
       reserveStation.setDest(instruction.getRegDestiny());
       reserveStation.setA(instruction.getRegOne().concat("+").concat(instruction.getImmediate()));
     } else {
-      // TODO verificar se tem dependencia e atualizar o Qj e Qk
       reserveStation.setOp(instruction.getIdentifier().getIdentifier());
       reserveStation.setVj(instruction.getRegOne());
       reserveStation.setVk(instruction.getRegTwo());
@@ -217,6 +235,9 @@ public class TomasuloAlgorithm {
 
   private static Optional<ReserveStation> getEmptyReserveStation(
       List<ReserveStation> reserveStations, Instruction instruction) {
+      if(instruction == null){
+        return Optional.empty();
+      }
     return reserveStations.stream()
         .filter(
             reserveStation ->
