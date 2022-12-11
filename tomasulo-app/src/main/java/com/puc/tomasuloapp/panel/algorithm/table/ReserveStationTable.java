@@ -86,4 +86,23 @@ public class ReserveStationTable extends JScrollPane implements ITable<ReserveSt
                 }
         }
     }
+
+  @Override
+  public void updateTable(List<ReserveStation> reserveStations) {
+
+    for (int row = 0; row < reserveStations.size(); row++) {
+
+      var reserveStation = reserveStations.get(row);
+
+      getModel().setValueAt(reserveStation.getName(), row, 0);
+      getModel().setValueAt(reserveStation.busyToString(), row, 1);
+      getModel().setValueAt(reserveStation.getOp(), row, 2);
+      getModel().setValueAt(reserveStation.getVj(), row, 3);
+      getModel().setValueAt(reserveStation.getVk(), row, 4);
+      getModel().setValueAt(reserveStation.getQj(), row, 5);
+      getModel().setValueAt(reserveStation.getQk(), row, 6);
+      getModel().setValueAt(reserveStation.getDest(), row, 7);
+      getModel().setValueAt(reserveStation.getA(), row, 8);
+    }
+  }
 }

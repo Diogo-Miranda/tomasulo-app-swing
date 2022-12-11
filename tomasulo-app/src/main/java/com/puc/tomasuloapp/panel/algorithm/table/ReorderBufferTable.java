@@ -87,4 +87,17 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
         }
     }
 
+  @Override
+  public void updateTable(List<Instruction> instructions) {
+
+    for (int row = 0; row < instructions.size(); row++) {
+
+      var instruction = instructions.get(row);
+      getModel().setValueAt(String.valueOf(row), row, 0);
+      getModel().setValueAt(instruction.busyToString(), row, 1);
+      getModel().setValueAt(instruction.toString(), row, 2);
+      getModel().setValueAt(instruction.getStatus(), row, 3);
+      getModel().setValueAt(instruction.getRegDestiny(), row, 4);
+    }
+  }
 }

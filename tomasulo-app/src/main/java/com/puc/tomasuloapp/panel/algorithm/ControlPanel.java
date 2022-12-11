@@ -2,6 +2,7 @@ package com.puc.tomasuloapp.panel.algorithm;
 
 import com.puc.tomasuloapp.core.RunButton;
 import com.puc.tomasuloapp.core.StepButton;
+import com.puc.tomasuloapp.model.Instruction;
 import com.puc.tomasuloapp.util.Converter;
 import com.sun.tools.javac.Main;
 import org.apache.batik.transcoder.TranscoderException;
@@ -10,6 +11,8 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class ControlPanel extends JPanel {
 
@@ -19,11 +22,12 @@ public class ControlPanel extends JPanel {
     public ControlPanel(AlgorithmPanel algorithmPanel) throws TranscoderException, IOException {
         var runIcon = svgIcon("run.svg");
         var stepIcon = svgIcon("right-arrow.svg");
+        Queue<Instruction> instructionQueue = new LinkedList<>();
 
-        runButton = new RunButton(algorithmPanel);
+        runButton = new RunButton(algorithmPanel, instructionQueue);
         runButton.setIcon(runIcon);
 
-        stepButton = new StepButton(algorithmPanel);
+        stepButton = new StepButton(algorithmPanel, instructionQueue);
         stepButton.setIcon(stepIcon);
 
         add(runButton, "wrap");

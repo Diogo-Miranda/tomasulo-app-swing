@@ -36,6 +36,20 @@ public class Instruction {
     }
 
     public String busyToString() {
-        return busy ? "Yes" : "Not";
+        return busy ? "true" : "false";
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if(object == null) return false;
+
+        var instruction = (Instruction) object;
+
+        return this.getId().equals(((Instruction) object).getId());
+    }
+
+    public boolean isLoadType() {
+        return this.getIdentifier().getFunctionalUnitName().equals("LOAD");
+    }
+
 }

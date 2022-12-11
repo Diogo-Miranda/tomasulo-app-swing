@@ -4,20 +4,20 @@ package com.puc.tomasuloapp.panel.algorithm.table;
 import com.puc.tomasuloapp.component.CoreComponent;
 import com.puc.tomasuloapp.domain.ITable;
 import com.puc.tomasuloapp.model.Register;
+import com.puc.tomasuloapp.util.RegistersUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class RegistersTable extends JScrollPane implements ITable<Register> {
-    public static final String VISITOR_BUSY = "busy";
-    public static final String VISITOR_REORD = "reord";
+public class RegistersTable extends JScrollPane {
 
     protected DefaultTableModel defaultTableModel;
     protected JTable registersTable;
     private static final int NUMBER_OF_REGISTERS = CoreComponent.numberOfRegs;
-
-    private static final int colNumber = CoreComponent.numberOfRegs;
 
     public RegistersTable(boolean editable) {
         defaultTableModel = new DefaultTableModel() {
@@ -27,7 +27,6 @@ public class RegistersTable extends JScrollPane implements ITable<Register> {
             }
         };
 
-        defaultTableModel.addColumn("Field");
         for(int i = 0; i < NUMBER_OF_REGISTERS; i++) {
             defaultTableModel.addColumn("F" + i);
         }
@@ -43,58 +42,42 @@ public class RegistersTable extends JScrollPane implements ITable<Register> {
         return defaultTableModel;
     }
 
-    @Override
-    public void updateRow(String visitorId, Object[] data) {
-        if (visitorId.equals(VISITOR_BUSY)) {
-            for (int j = 1; j < data.length+1; j++) {
-                getModel().setValueAt(data[j-1], 1, j);
-            }
-        } else if (visitorId.equals(VISITOR_REORD)) {
-            for (int j = 1; j < data.length+1; j++) {
-                getModel().setValueAt(data[j-1], 0, j);
-            }
-        }
-    }
-
     public void addRow(List<Register> registers) {
         addRow(registers, true);
     }
 
-    @Override
-    public Object[] getRow(int row) {
-        Object[] result = new String[colNumber];
+    public List<Register> getRegisters() {
+        List<Register> registers = new ArrayList<>();
 
-        for (int i = 1; i < colNumber; i++) {
-            result[i-1] = getModel().getValueAt(row, i);
+        for (int i = 0; i < NUMBER_OF_REGISTERS; i++) {
+          var object = getModel().getValueAt(0, i);
+          Register register;
+          if(object == null) register = new Register();
+          else {
+              register = new RegistersUtils().deserialize(object);
+          }
+          register.setName(getModel().getColumnName(i));
+          registers.add(register);
         }
 
-        return result;
+        return registers;
     }
 
-    @Override
     public int getRowCount() {
         return getModel().getRowCount();
     }
 
     public void addRow(List<Register> registers, boolean withFocus) {
-        Object[] rowData = new Object[NUMBER_OF_REGISTERS + 1];
-
-        rowData[0] = "Reord.#";
-        for(int i = 1; i <= NUMBER_OF_REGISTERS; i++) {
-            var reorderNumber = registers.get(i-1).getReorderNumber();
-            if (reorderNumber != null)
-                rowData[i] = reorderNumber.toString();
-            else
-                rowData[i] = "";
-        }
-
-        getModel().addRow(rowData);
-
-        rowData[0] = "Busy";
-        for(int i = 1; i <= NUMBER_OF_REGISTERS; i++) {
-            rowData[i] = registers.get(i-1).busyToString();
-        }
+        Object[] rowData = new Object[NUMBER_OF_REGISTERS];
 
         getModel().addRow(rowData);
     }
+
+  public void updateTable(List<Register> registers) {
+
+    for (int colunm = 0; colunm < registers.size(); colunm++) {
+      var register = registers.get(colunm);
+      getModel().setValueAt(register.getInstructionValue(), 0, colunm);
+    }
+  }
 }

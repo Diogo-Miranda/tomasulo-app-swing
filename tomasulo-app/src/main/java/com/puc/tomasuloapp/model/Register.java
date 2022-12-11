@@ -11,10 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Register {
     private String name;
-    private Integer reorderNumber;
-    private Boolean busy;
-
-    public String busyToString() {
-        return busy ? "Yes" : "Not";
-    }
+    private String instructionValue;
 }
