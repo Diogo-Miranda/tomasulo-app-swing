@@ -22,6 +22,7 @@ public class Instruction {
     private Boolean busy;
     private Integer inOrder;
     private String status;
+    private String instructionValue;
 
     public String toString() {
         return new StringBuilder()

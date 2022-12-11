@@ -52,25 +52,27 @@ public class TomasuloAlgorithm {
     var previousInstruction =
         instructionIndex <= 0 ? instruction : instructions.get(instructionIndex - 1);
 
-    // Primeiras validações, ajustes de clock e mudança de estado dos componentes
+    // Primeiras validações, ajustes de clock e mudança de estado dos componentes e atualiza valor do registrador
     checkAndUpdateInstructions(instructions);
     checkAndUpdateReserveStations(instructions, reserveStations);
+    checkAndUpdateRegisters(instructions, registers);
     reorderBufferTable.updateTable(instructions);
     reserveStationTable.updateTable(reserveStations);
+    registersTable.updateTable(registers);
 
     // Validar se a instrucao não possui dependencias
     if (!validateNextInstruction(previousInstruction, instruction) && instructionIndex != 0) {
       return;
     }
 
-    // Ir para a proxima Instrucao
-    instructionQueue.remove();
-
     // Validar se a instrução possui unidades funcionais livres
     var emptyReserveStation = getEmptyReserveStation(reserveStations, instruction);
     if (emptyReserveStation.isEmpty()) {
       return;
     }
+
+    // Ir para a proxima Instrucao
+    instructionQueue.remove();
 
     // Atualizar reserveStation que estava disponivel para a instrucao pega da fila
     updateReserveStations(instruction, emptyReserveStation.get());
@@ -85,6 +87,14 @@ public class TomasuloAlgorithm {
     var register = findRegisterByName(registers, instruction);
     register.setInstructionValue(emptyReserveStation.get().getName());
     registersTable.updateTable(registers);
+  }
+
+  private void checkAndUpdateRegisters(List<Instruction> instructions, List<Register> registers) {
+    instructions.stream().filter(
+            instruction1 ->
+                instruction1.getStatus().equals("Commit")).forEach(
+                    instruction1 ->
+                        updateRegisterValue(registers, instruction1));
   }
 
   private void checkAndUpdateReserveStations(
@@ -125,7 +135,11 @@ public class TomasuloAlgorithm {
     if (entry.getValue() == 0) {
       Instruction instruction = filterInstructionById(instructions, entry);
       instruction.setStatus("Write Result");
-
+      if (instruction.isLoadType()) {
+        instruction.setInstructionValue("MEM[" + instruction.getRegOne().concat("+").concat(instruction.getImmediate()).concat("]"));
+      } else {
+        instruction.setInstructionValue(instruction.getRegOne().concat(instruction.getIdentifier().getSimbol().concat(instruction.getRegTwo())));
+      }
     } else if (entry.getValue() < 0) {
       Instruction instruction = filterInstructionById(instructions, entry);
       instruction.setStatus("Commit");
@@ -133,6 +147,12 @@ public class TomasuloAlgorithm {
     }
   }
 
+  private void updateRegisterValue(List<Register> registers, Instruction instruction)
+  {
+    var register = findRegisterByName(registers, instruction);
+    var registerValue = register.getInstructionValue();
+    register.setInstructionValue(registerValue.contains("VAL") ? registerValue : "VAL("+register.getInstructionValue().concat(")"));
+  }
   private static Instruction filterInstructionById(
       List<Instruction> instructions, Map.Entry<String, Integer> entry) {
     return instructions.stream()
@@ -148,7 +168,7 @@ public class TomasuloAlgorithm {
     if (instructionIndex == 0) {
       var instructionsList = instructionQueue.stream().collect(Collectors.toList());
       clocksToFinish.put(instructionsList.get(0).getId(), 2);
-      clocksToFinish.put(instructionsList.get(1).getId(), 2);
+      clocksToFinish.put(instructionsList.get(1).getId(), 5);
       clocksToFinish.put(instructionsList.get(2).getId(), 4);
       clocksToFinish.put(instructionsList.get(3).getId(), 1);
       clocksToFinish.put(instructionsList.get(4).getId(), 3);

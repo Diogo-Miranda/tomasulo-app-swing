@@ -47,7 +47,7 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
             // Instruction
             rowData[2] = instruction.toString();
             // Status
-            rowData[3] = "intial";
+            rowData[3] = "initial";
             // Destino
             rowData[4] = instruction.getRegDestiny();
             instructionCount++;
@@ -98,6 +98,7 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
       getModel().setValueAt(instruction.toString(), row, 2);
       getModel().setValueAt(instruction.getStatus(), row, 3);
       getModel().setValueAt(instruction.getRegDestiny(), row, 4);
+      getModel().setValueAt(instruction.getInstructionValue(), row, 5);
     }
   }
 }

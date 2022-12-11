@@ -16,6 +16,8 @@ public class InstructionUtils implements ISerializable<Instruction> {
         // Status
         var status = (String) rowData[3];
 
+        var instructionValue = (String) rowData[5];
+
         String[] instructionSplited = instructionExpression.split(" ");
         var instruction = instructionSplited[0];
         var regs = instructionSplited[1].split(",");
@@ -30,6 +32,7 @@ public class InstructionUtils implements ISerializable<Instruction> {
                     .regOne(regs[1])
                     .immediate(regs[2])
                     .status(status)
+                    .instructionValue(instructionValue)
                     .build();
         } else {
             return Instruction.builder()
@@ -40,6 +43,7 @@ public class InstructionUtils implements ISerializable<Instruction> {
                     .regOne(regs[1])
                     .regTwo(regs[2])
                     .status(status)
+                    .instructionValue(instructionValue)
                     .build();
         }
     }
@@ -51,6 +55,7 @@ public class InstructionUtils implements ISerializable<Instruction> {
         data[2] = instruction.getStatus();
         data[3] = instruction.getRegDestiny();
         data[4] = "";
+        data[5] = instruction.getInstructionValue();
         return data;
     }
 }
