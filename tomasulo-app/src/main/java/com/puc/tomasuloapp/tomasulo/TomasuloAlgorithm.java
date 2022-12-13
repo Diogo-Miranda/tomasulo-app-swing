@@ -13,6 +13,8 @@ import com.puc.tomasuloapp.util.SerializableUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.puc.tomasuloapp.util.ClockUtils.getClocksToFinish;
+
 public class TomasuloAlgorithm {
 
     private ReorderBufferTable reorderBufferTable;
@@ -181,17 +183,13 @@ public class TomasuloAlgorithm {
   }
 
   private void initClocksToFinish(List<Instruction> instructions) {
-    // FIXME gambiarra
     var instructionIndex =
         instructionQueue.peek() == null ? -1 : instructions.indexOf(instructionQueue.peek());
     if (instructionIndex == 0) {
       var instructionsList = instructionQueue.stream().collect(Collectors.toList());
-      clocksToFinish.put(instructionsList.get(0).getId(), 2);
-      clocksToFinish.put(instructionsList.get(1).getId(), 5);
-      clocksToFinish.put(instructionsList.get(2).getId(), 4);
-      clocksToFinish.put(instructionsList.get(3).getId(), 1);
-      clocksToFinish.put(instructionsList.get(4).getId(), 3);
-      clocksToFinish.put(instructionsList.get(5).getId(), 1);
+      for (int i = 0; i < instructionsList.size(); i++) {
+        clocksToFinish.put(instructionsList.get(i).getId(), getClocksToFinish(instructionsList.get(i)));
+      }
     }
   }
 
