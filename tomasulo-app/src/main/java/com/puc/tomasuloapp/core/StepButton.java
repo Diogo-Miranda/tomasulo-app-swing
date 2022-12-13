@@ -18,7 +18,6 @@ public class StepButton extends JButton {
 
     private final Queue<Instruction> instructionQueue;
 
-
     public StepButton(AlgorithmPanel algorithmPanel, Queue<Instruction> instructionQueue) {
         this.instructionQueue = instructionQueue;
         setText("Next");
@@ -38,5 +37,8 @@ public class StepButton extends JButton {
                         new ReserveStationUtils());
 
         new TomasuloAlgorithm(algorithmPanel, instructionQueue).run(instructions, registers, reserveStations);
+
+        var clockCount = algorithmPanel.controlPanel.ciclesPanel.cyclesTextArea;
+        clockCount.setText(String.valueOf(Integer.valueOf(clockCount.getText()) + 1));
     }
 }

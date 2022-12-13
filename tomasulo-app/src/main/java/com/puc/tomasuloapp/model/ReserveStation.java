@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -35,12 +37,13 @@ public class ReserveStation {
         this.a = null;
     }
 
-  public boolean isEqualToInstruction(Instruction instruction, boolean isLoadType) {
+  public boolean isEqualToInstruction(Instruction instruction, boolean isLoadType, List<Register> registers) {
     if (!isLoadType) {
-      return this.getOp() != null // TODO não ta verificando o regDestiny
-          && this.getOp().equals(instruction.getIdentifier().getIdentifier())
-          && this.getVj().equals(instruction.getRegOne())
-          && this.getVk().equals(instruction.getRegTwo());
+        var outro = getCorrespondente(registers);
+      return outro.getOp() != null // TODO não ta verificando o regDestiny
+          && outro.getOp().equals(instruction.getIdentifier().getIdentifier())
+          && outro.getVj().equals(instruction.getRegOne())
+          && outro.getVk().equals(instruction.getRegTwo());
     }
 
     if (this.getA() == null) {
@@ -50,5 +53,33 @@ public class ReserveStation {
     return instruction.getRegDestiny().equals(this.getDest())
         && regs[0].equals(instruction.getRegOne())
         && regs[1].equals(instruction.getImmediate());
+  }
+
+  private ReserveStation getCorrespondente(List<Register> registers) {
+
+    var outro = new ReserveStation();
+    outro.setName(this.name);
+    outro.setBusy(this.busy);
+    outro.setOp(this.op);
+    outro.setVj(this.vj);
+    outro.setVk(this.vk);
+    outro.setQj(this.qj);
+    outro.setQk(this.qk);
+    outro.setDest(this.dest);
+    outro.setA(this.a);
+
+
+    registers
+        .forEach(
+            register -> {
+              var instructionValue = register.getInstructionValue();
+              if(instructionValue == null) return;
+              if (instructionValue.equals(outro.getVj())) outro.setVj(register.getName());
+              if (instructionValue.equals(outro.getVk())) outro.setVk(register.getName());
+              if (instructionValue.equals(outro.getQj())) outro.setQj(register.getName());
+              if (instructionValue.equals(outro.getQk())) outro.setQk(register.getName());
+            });
+
+    return outro;
   }
 }

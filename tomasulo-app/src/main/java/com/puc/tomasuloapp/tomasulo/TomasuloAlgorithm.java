@@ -10,8 +10,11 @@ import com.puc.tomasuloapp.panel.algorithm.table.ReserveStationTable;
 import com.puc.tomasuloapp.util.RegistersUtils;
 import com.puc.tomasuloapp.util.SerializableUtils;
 
+import javax.swing.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.puc.tomasuloapp.util.ClockUtils.getClocksToFinish;
 
@@ -33,6 +36,7 @@ public class TomasuloAlgorithm {
         reorderBufferTable = algorithmPanel.reorderBufferPanel.reorderBufferWrapped.reorderBufferTable;
         registersTable = algorithmPanel.registersPanel.registersWrapped.registersTable;
         reserveStationTable = algorithmPanel.reserveStationPanel.reserveStationWrapped.reserveStationTable;
+
         instructionSerializable = new SerializableUtils<>();
         reserveStationSerializable = new SerializableUtils<>();
         registersSerializable = new RegistersUtils();
@@ -51,12 +55,14 @@ public class TomasuloAlgorithm {
     var instructionIndex =
         instructionQueue.peek() == null ? -1 : instructions.indexOf(instructionQueue.peek());
     var instruction = instructionIndex < 0 ? null : instructions.get(instructionIndex);
-    var previousInstruction =
-        instructionIndex <= 0 ? instruction : instructions.get(instructionIndex - 1);
+    var previousInstructions = instructions.stream()
+            .filter(element -> !instructionQueue.contains(element))
+            .collect(Collectors.toList());
 
     // Primeiras validações, ajustes de clock e mudança de estado dos componentes e atualiza valor do registrador
     checkAndUpdateInstructions(instructions);
-    checkAndUpdateReserveStations(instructions, reserveStations);
+    checkAndUpdateReserveStationWithVal(instructions, registers, reserveStations);
+    checkAndUpdateReserveStations(instructions, reserveStations, registers);
     checkAndUpdateRegisters(instructions, registers);
     reorderBufferTable.updateTable(instructions);
     reserveStationTable.updateTable(reserveStations);
@@ -68,19 +74,26 @@ public class TomasuloAlgorithm {
       return;
     }
 
+    // Ir para a proxima Instrucao
+    instructionQueue.remove();
+
     // Atualizar reserveStation que estava disponivel para a instrucao pega da fila
     updateReserveStations(instruction, emptyReserveStation.get());
     reserveStationTable.updateTable(reserveStations);
 
     // Validar se a instrucao não possui dependencias
-    if (!validateNextInstruction(previousInstruction, instruction) && instructionIndex != 0) {
-      updateReserveStationsQjAndQk(previousInstruction.getRegDestiny(), instruction, emptyReserveStation.get());
+    if (!validateNextInstructions(previousInstructions, instruction) && instructionIndex != 0) {
+      updateReserveStationsQjAndQk(previousInstructions, instruction, reserveStations, emptyReserveStation.get());
       // TODO além de validar Vj e Vk em todos os exemplos que são usados agora é preciso validar Qj e Qk
       reserveStationTable.updateTable(reserveStations);
+      instruction.setBusy(true);
+      instruction.setStatus("Executing");
+      var register = findRegisterByName(registers, instruction);
+      register.setInstructionValue(emptyReserveStation.get().getName());
+      registersTable.updateTable(registers);
+      reorderBufferTable.updateTable(instructions);
+      return;
     }
-
-    // Ir para a proxima Instrucao
-    instructionQueue.remove();
 
     // Atualizar instrucao atual que foi pega da fila
     instruction.setBusy(true);
@@ -93,18 +106,55 @@ public class TomasuloAlgorithm {
     registersTable.updateTable(registers);
   }
 
-  private void updateReserveStationsQjAndQk(String previousInstructionDestiny, Instruction instruction, ReserveStation reserveStation)
+  private void updateReserveStationsQjAndQk(
+      List<Instruction> previousInstructions,
+      Instruction instruction,
+      List<ReserveStation> reserveStations,
+      ReserveStation reserveStation) {
+
+    previousInstructions.forEach(
+        previousInstruction -> {
+          var reserveStationName =
+              reserveStations.stream()
+                  .filter(
+                      reserveStation1 ->
+                          reserveStation1
+                                  .getName()
+                                  .contains(
+                                      previousInstruction.getIdentifier().getFunctionalUnitName())
+                              && (reserveStation1.getDest() != null && reserveStation1.getDest().equals(previousInstruction.getRegDestiny())))
+                  .findFirst();
+
+          if(reserveStationName.isEmpty()) {
+            return;
+          }
+
+          updateReserveStationsQjAndQk(
+              previousInstruction, instruction, reserveStation, reserveStationName.get().getName());
+        });
+  }
+
+  private void updateReserveStationsQjAndQk(Instruction previousInstruction, Instruction instruction, ReserveStation reserveStation, String reserveStationName)
   {
+
+    var previousInstructionDestiny = previousInstruction.getRegDestiny();
     if (instruction.isLoadType()) {
       return;
     }
+    if(previousInstructionDestiny.equals(instruction.getRegOne()) || previousInstructionDestiny.equals(instruction.getRegTwo())) {
+      clocksToFinish.replace(instruction.getId(), 1 + clocksToFinish.get(instruction.getId()) + clocksToFinish.get(previousInstruction.getId()));
+      instruction.setInstructionValue("");
+    }
+
     if(previousInstructionDestiny.equals(instruction.getRegOne())) {
-      reserveStation.setQj(instruction.getRegOne());
+      //reserveStation.setQj(instruction.getRegOne());
+      reserveStation.setQj(reserveStationName);
       reserveStation.setVj("");
     }
 
-    else if(previousInstructionDestiny.equals(instruction.getRegTwo())) {
-      reserveStation.setQk(instruction.getRegTwo());
+    if(previousInstructionDestiny.equals(instruction.getRegTwo())) {
+      //reserveStation.setQk(instruction.getRegTwo());
+      reserveStation.setQk(reserveStationName);
       reserveStation.setVk("");
     }
     // TODO Verificar todas as instruções anteriores
@@ -119,7 +169,7 @@ public class TomasuloAlgorithm {
   }
 
   private void checkAndUpdateReserveStations(
-      List<Instruction> instructions, List<ReserveStation> reserveStations) {
+      List<Instruction> instructions, List<ReserveStation> reserveStations, List<Register> registers) {
 
     reserveStations.forEach(
         reserveStation ->
@@ -127,10 +177,75 @@ public class TomasuloAlgorithm {
                 instruction -> {
                   boolean isLoadType = instruction.isLoadType();
                   if (!instruction.getBusy()
-                      && reserveStation.isEqualToInstruction(instruction, isLoadType)) {
+                      && reserveStation.isEqualToInstruction(instruction, isLoadType, registers)) {
                     reserveStation.setAllFieldsNull();
                   }
                 }));
+  }
+
+  private void checkAndUpdateReserveStationWithVal(
+      List<Instruction> instructions,
+      List<Register> registers,
+      List<ReserveStation> reserveStations) {
+
+    getFiltredReserveStations(registers, reserveStations);
+  }
+
+  private void getFiltredReserveStations(
+      List<Register> registers, List<ReserveStation> reserveStations) {
+
+    var b =
+        registers.stream()
+            .flatMap(
+                register ->
+                    reserveStations.stream()
+                        .filter(
+                            reserveStation ->
+                                reserveStation.getDest() != null
+                                    && reserveStation.getDest().equals(register.getName())));
+
+    b.forEach(
+        reserveStation -> {
+          var qj = reserveStation.getQj() != null && !reserveStation.getQj().isEmpty() ? reserveStation.getQj() : "xxx";
+          var qk = reserveStation.getQk() != null && !reserveStation.getQk().isEmpty() ? reserveStation.getQk() : "xxx";
+
+          var instructionValueQj =
+              registers.stream()
+                  .filter(
+                      register -> {
+                        if (register.getInstructionValue() == null) {
+                          return false;
+                        }
+                        return register.getInstructionValue().contains("VAL(".concat(qj));
+                      })
+                  .findFirst();
+
+          var instructionValueQk =
+              registers.stream()
+                  .filter(
+                      register -> {
+                        if (register.getInstructionValue() == null) {
+                          return false;
+                        }
+                        return register.getInstructionValue().contains("VAL(".concat(qk));
+                      })
+                  .findFirst();
+
+          registers.forEach(
+              register -> {
+                if (instructionValueQj.isPresent()) {
+                  var instructionValue = instructionValueQj.get().getInstructionValue();
+                  reserveStation.setVj(instructionValue);
+                  reserveStation.setQj("");
+                }
+
+                if (instructionValueQk.isPresent()) {
+                  var instructionValue = instructionValueQk.get().getInstructionValue();
+                  reserveStation.setVk(instructionValue);
+                  reserveStation.setQk("");
+                }
+              });
+        });
   }
 
   private void checkAndUpdateInstructions(List<Instruction> instructions) {
@@ -172,6 +287,9 @@ public class TomasuloAlgorithm {
   {
     var register = findRegisterByName(registers, instruction);
     var registerValue = register.getInstructionValue();
+    if(registerValue == null) {
+      return;
+    }
     register.setInstructionValue(registerValue.contains("VAL") ? registerValue : "VAL("+register.getInstructionValue().concat(")"));
   }
   private static Instruction filterInstructionById(
@@ -200,18 +318,33 @@ public class TomasuloAlgorithm {
         .get();
   }
 
-  private boolean validateNextInstruction(
-      Instruction previousInstruction, Instruction nextInstruction) {
+  private boolean validateNextInstructions(
+      List<Instruction> previousInstructions, Instruction currentInstruction) {
+      AtomicReference<Boolean> isValid = new AtomicReference<>(true);
 
-    if (previousInstruction == null || nextInstruction == null) {
+    previousInstructions.forEach(previousInstruction -> {
+      if(!validateNextInstruction(previousInstruction, currentInstruction)) {
+        isValid.set(false);
+      }
+    });
+
+    return isValid.get();
+  }
+
+  private boolean validateNextInstruction(
+          Instruction previousInstruction, Instruction currentInstruction) {
+
+    if (previousInstruction == null || currentInstruction == null) {
       return false;
     }
     var previousInstructionReg = previousInstruction.getRegDestiny();
 
+
+
     // TODO Conferir se precisa olhar mais dependencias (ta olhando só de uma instrucao anterior)
-    if ((previousInstructionReg.equals(nextInstruction.getRegOne())
-            || previousInstructionReg.equals(nextInstruction.getRegTwo()))
-        && clocksToFinish.get(previousInstruction.getId()) != 0) {
+    if ((previousInstructionReg.equals(currentInstruction.getRegOne())
+            || previousInstructionReg.equals(currentInstruction.getRegTwo()))
+            && clocksToFinish.get(previousInstruction.getId()) != 0) {
       return false;
     }
     return true;
@@ -221,8 +354,8 @@ public class TomasuloAlgorithm {
 
     reserveStation.setBusy(true);
 
+    reserveStation.setDest(instruction.getRegDestiny());
     if (instruction.isLoadType()) {
-      reserveStation.setDest(instruction.getRegDestiny());
       reserveStation.setA(instruction.getRegOne().concat("+").concat(instruction.getImmediate()));
     } else {
       reserveStation.setOp(instruction.getIdentifier().getIdentifier());
