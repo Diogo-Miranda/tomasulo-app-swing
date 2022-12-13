@@ -7,6 +7,7 @@ public interface ITable<T> {
     void addRow(List<T> input);
     Object[] getRow(int row);
     int getRowCount();
+    void updateTable(List<T> input);
 
     DefaultTableModel getModel();
     void updateRow(String visitorId, Object[] data);

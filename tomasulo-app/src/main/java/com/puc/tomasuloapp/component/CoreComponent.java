@@ -107,9 +107,8 @@ public class CoreComponent {
     public static ArrayList<Register> initRegisters() {
         var registers = new ArrayList<Register>();
         for (int i = 0; i < numberOfRegs; i++) {
-            registers.add(Register.builder()
-                    .reorderNumber(null)
-                    .busy(false)
+            registers.add(Register.builder().name("F" + 0)
+                    .instructionValue(null)
                     .build());
         }
         return registers;
