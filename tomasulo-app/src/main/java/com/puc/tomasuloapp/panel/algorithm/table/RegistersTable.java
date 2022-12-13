@@ -7,6 +7,7 @@ import com.puc.tomasuloapp.model.Register;
 import com.puc.tomasuloapp.util.RegistersUtils;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,11 @@ public class RegistersTable extends JScrollPane {
 
     public void addRow(List<Register> registers) {
         addRow(registers, true);
+        var centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        centerRenderer.setVerticalAlignment(JLabel.CENTER);
+        for (int i = 0; i < NUMBER_OF_REGISTERS; i++)
+            registersTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
     }
 
     public List<Register> getRegisters() {

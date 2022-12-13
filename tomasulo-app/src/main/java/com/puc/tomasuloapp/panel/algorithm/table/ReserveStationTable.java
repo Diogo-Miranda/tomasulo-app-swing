@@ -5,6 +5,7 @@ import com.puc.tomasuloapp.model.Instruction;
 import com.puc.tomasuloapp.model.ReserveStation;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
@@ -54,6 +55,11 @@ public class ReserveStationTable extends JScrollPane implements ITable<ReserveSt
             // add on table
             getModel().addRow(rowData);
         }
+        var centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        centerRenderer.setVerticalAlignment(JLabel.CENTER);
+        for(int i = 0; i < 8; i++)
+            registersTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
     }
 
     public Object[] getRow(int row) {

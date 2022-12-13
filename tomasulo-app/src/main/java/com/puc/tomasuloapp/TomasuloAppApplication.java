@@ -21,8 +21,9 @@ public class TomasuloAppApplication extends JFrame {
 		System.setProperty("sun.java2d.renderer", "sun.java2d.marlin.MarlinRenderingEngine");
 
 		UIManager.put("Button.font", FontLoader.getDefaultFont());
-		UIManager.put("Table.font", FontLoader.getDefaultFont());
-
+		UIManager.put("Table.font", FontLoader.getTableFont());
+		UIManager.put("Label.font", FontLoader.getTableFont());
+		UIManager.put("TextArea.font", FontLoader.getTableFont());
 
 		SwingUtilities.invokeLater(() -> {
 			// macOS support

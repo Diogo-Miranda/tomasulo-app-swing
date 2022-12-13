@@ -27,6 +27,7 @@ public class RunButton extends JButton {
             makeReserveStationTable(algorithmPanel);
             fillInstructionsQueue(algorithmPanel);
             algorithmPanel.controlPanel.stepButton.setEnabled(true);
+            algorithmPanel.controlPanel.ciclesPanel.setVisible(true);
         });
     }
 

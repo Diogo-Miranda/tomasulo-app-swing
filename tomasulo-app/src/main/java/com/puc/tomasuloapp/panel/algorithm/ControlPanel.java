@@ -8,6 +8,7 @@ import com.sun.tools.javac.Main;
 import org.apache.batik.transcoder.TranscoderException;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -18,20 +19,25 @@ public class ControlPanel extends JPanel {
 
     public final StepButton stepButton;
     public final RunButton runButton;
+    public final CiclesPanel ciclesPanel;
 
     public ControlPanel(AlgorithmPanel algorithmPanel) throws TranscoderException, IOException {
         var runIcon = svgIcon("run.svg");
         var stepIcon = svgIcon("right-arrow.svg");
         Queue<Instruction> instructionQueue = new LinkedList<>();
 
+        ciclesPanel = new CiclesPanel();
+
         runButton = new RunButton(algorithmPanel, instructionQueue);
         runButton.setIcon(runIcon);
 
         stepButton = new StepButton(algorithmPanel, instructionQueue);
         stepButton.setIcon(stepIcon);
+        ciclesPanel.setVisible(false);
 
         add(runButton, "wrap");
         add(stepButton, "wrap");
+        add(ciclesPanel, "wrap,east");
     }
 
     public ImageIcon svgIcon(String iconName) throws IOException, TranscoderException {

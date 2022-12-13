@@ -5,6 +5,7 @@ import com.puc.tomasuloapp.domain.ITable;
 import com.puc.tomasuloapp.model.Instruction;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
@@ -34,9 +35,17 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
         setViewportView(registersTable);
 
         registersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        var centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        centerRenderer.setVerticalAlignment(JLabel.CENTER);
+        registersTable.setDefaultRenderer(String.class, centerRenderer);
     }
 
     public void addRow(List<Instruction> instructions) {
+        var centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        centerRenderer.setVerticalAlignment(JLabel.CENTER);
         Integer instructionCount = 0;
         for(var instruction : instructions) {
             Object[] rowData = new Object[colNumber];
@@ -47,7 +56,7 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
             // Instruction
             rowData[2] = instruction.toString();
             // Status
-            rowData[3] = "initial";
+            rowData[3] = "Issue";
             // Destino
             rowData[4] = instruction.getRegDestiny();
             instructionCount++;
@@ -55,6 +64,10 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
             // add on table
             getModel().addRow(rowData);
         }
+        registersTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+        registersTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        registersTable.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+        registersTable.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
     }
 
     public Object[] getRow(int row) {
@@ -89,7 +102,6 @@ public class ReorderBufferTable extends JScrollPane implements ITable<Instructio
 
   @Override
   public void updateTable(List<Instruction> instructions) {
-
     for (int row = 0; row < instructions.size(); row++) {
 
       var instruction = instructions.get(row);
