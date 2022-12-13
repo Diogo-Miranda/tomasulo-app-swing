@@ -16,8 +16,8 @@ public enum InstructionsEnum {
   SUB("SUB", "ADD", "-", INTEGER_CYCLES),
   DIV("DIV", "MULT", "/", FLOAT_CYCLES),
   MUL("MUL", "MULT", "*", FLOAT_CYCLES),
-  BEQ("BEQ", "BEQ", "", BRANCH_CYCLES),
-  BNE("BNE", "BNE", "", BRANCH_CYCLES);
+  BEQ("BEQ", "INTEGER", "", BRANCH_CYCLES),
+  BNE("BNE", "INTEGER", "", BRANCH_CYCLES);
 
   private String identifier;
   private String functionalUnitName;
