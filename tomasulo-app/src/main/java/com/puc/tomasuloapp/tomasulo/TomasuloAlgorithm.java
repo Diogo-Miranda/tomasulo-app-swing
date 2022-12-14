@@ -48,7 +48,6 @@ public class TomasuloAlgorithm {
       List<ReserveStation> reserveStations) {
 
     // Carregar clocks que faltam para cada instrucao
-    // TODO pegar essa config de um arquivo
     initClocksToFinish(instructions);
 
     // Criação de variaveis de instrucao
@@ -84,7 +83,6 @@ public class TomasuloAlgorithm {
     // Validar se a instrucao não possui dependencias
     if (!validateNextInstructions(previousInstructions, instruction) && instructionIndex != 0) {
       updateReserveStationsQjAndQk(previousInstructions, instruction, reserveStations, emptyReserveStation.get());
-      // TODO além de validar Vj e Vk em todos os exemplos que são usados agora é preciso validar Qj e Qk
       reserveStationTable.updateTable(reserveStations);
       instruction.setBusy(true);
       instruction.setStatus("Executing");
